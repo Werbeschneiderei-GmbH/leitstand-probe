@@ -1,7 +1,7 @@
 # Leitstand Probe
 
 Prüft für die Werbeschneiderei, ob die Anfrageformulare der betreuten Betriebe
-wirklich ankommen. Sechsmal am Tag schickt ein Browser jedes Formular aus
+wirklich ankommen. Sechsmal am Tag, angestoßen aus n8n, schickt ein Browser jedes Formular aus
 `strecken.json` mit einer Probe-Adresse ab. Der n8n-Workflow des Betriebs
 erkennt die Probe, schickt sie weder an den Betrieb noch ins CRM, sondern als
 Mail an eine Prüfung bei healthchecks.io. Bleibt diese Mail aus, kommt eine

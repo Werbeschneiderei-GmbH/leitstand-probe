@@ -4,6 +4,10 @@
 # Test-Weiche in n8n schickt ihre Mail an die Prüfung der Strecke. Bleibt sie
 # aus, mailt healthchecks.io.
 #
+# Den Takt gibt n8n (Workflow „Leitstand - Proben-Takt“, 7:17 bis 22:17 Wiener
+# Zeit) über die GitHub-Schnittstelle. Der eigene Zeitplan von GitHub ließ am
+# 20.10.2026 einen Lauf ganz ausfallen, für eine Überwachung zu unzuverlässig.
+#
 # Warum ein eigenes, öffentliches Repo: Actions ist hier kostenlos und ohne
 # Minutengrenze. Im OS-Repo hätte die Probe mit der CI die 2.000 Freiminuten
 # gesprengt, und ohne Zahlungsart hält GitHub dann auch CI und Deploy an.
@@ -11,11 +15,6 @@
 name: Probe
 
 on:
-  schedule:
-    # UTC, im Sommer 7:17 bis 22:17 Wiener Zeit, im Winter eine Stunde früher.
-    # Minute 17 statt 0, weil GitHub Läufe zur vollen Stunde oft spät startet.
-    # Bei Änderung den Zeitplan der Prüfungen bei healthchecks.io mitziehen.
-    - cron: "17 5,8,11,14,17,20 * * *"
   workflow_dispatch:
     inputs:
       strecken:
@@ -33,7 +32,6 @@ concurrency:
 
 permissions:
   contents: read
-  actions: write
 
 jobs:
   probe:
@@ -42,16 +40,6 @@ jobs:
     # Browser vorinstalliert, Version gleich @playwright/test in package.json.
     container: mcr.microsoft.com/playwright:v1.64.0-noble
     steps:
-      # Öffentliche Repos verlieren ihren Zeitplan nach 60 Tagen ohne Änderung.
-      # Jeder Lauf schaltet ihn deshalb ausdrücklich ein. Fällt er trotzdem
-      # aus, melden alle Prüfungen bei healthchecks.io.
-      - name: Zeitplan wach halten
-        continue-on-error: true
-        run: |
-          curl -fsS -X PUT -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/${{ github.repository }}/actions/workflows/probe.yml/enable"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/checkout@v4
       - run: npm install --no-audit --no-fund
       # Eingaben über env, nie direkt in die Befehlszeile (Einschleusen).
