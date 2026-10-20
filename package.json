@@ -1,0 +1,9 @@
+{
+  "name": "leitstand-probe",
+  "private": true,
+  "type": "module",
+  "description": "Probe der Anfrage-Kette: schickt die echten Formulare der Pilot-Strecken ab, healthchecks.io prüft das Lebenszeichen.",
+  "dependencies": {
+    "@playwright/test": "1.64.0"
+  }
+}

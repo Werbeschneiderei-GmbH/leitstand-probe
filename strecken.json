@@ -1,0 +1,47 @@
+[
+  {
+    "strecke": "schmid-kontakt",
+    "name": "Garten Schmid, Kontaktformular",
+    "url": "https://garten-schmid.at/kontakt"
+  },
+  {
+    "strecke": "schmid-garten",
+    "name": "Garten Schmid, Gartenanfrage",
+    "url": "https://garten-schmid.at/gartenanfrage"
+  },
+  {
+    "strecke": "schmid-biodesign",
+    "name": "Garten Schmid, Biodesign-Pool",
+    "url": "https://garten-schmid.at/biodesign-premiere"
+  },
+  {
+    "strecke": "schmid-lkw",
+    "name": "Garten Schmid, Bewerbung LKW-Fahrer:in",
+    "url": "https://garten-schmid.at/job-lkw-fahrer"
+  },
+  {
+    "strecke": "kramer-garten",
+    "name": "Kramer und Kramer, Gartenanfrage",
+    "url": "https://ads.kramerundkramer.at/"
+  },
+  {
+    "strecke": "weix-pv",
+    "name": "Weix, Photovoltaik",
+    "url": "https://weix.at/photovoltaikanlage"
+  },
+  {
+    "strecke": "weix-wallbox",
+    "name": "Weix, Wallbox",
+    "url": "https://weix.at/wallbox"
+  },
+  {
+    "strecke": "weix-klima",
+    "name": "Weix, Klimaanlage",
+    "url": "https://weix.at/klimagerate"
+  },
+  {
+    "strecke": "weix-kontakt",
+    "name": "Weix, Kontaktformular",
+    "url": "https://weix.at/kontakt"
+  }
+]

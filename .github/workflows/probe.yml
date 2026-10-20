@@ -1,0 +1,63 @@
+# Probe der Anfrage-Kette (Leitstand der Werbeschneiderei, im OS spec/26).
+# Schickt die echten Formulare der Pilot-Strecken mit der Probe-Adresse ab. Ob
+# eine Probe durchkam, prüft healthchecks.io, nicht dieser Lauf: die
+# Test-Weiche in n8n schickt ihre Mail an die Prüfung der Strecke. Bleibt sie
+# aus, mailt healthchecks.io.
+#
+# Warum ein eigenes, öffentliches Repo: Actions ist hier kostenlos und ohne
+# Minutengrenze. Im OS-Repo hätte die Probe mit der CI die 2.000 Freiminuten
+# gesprengt, und ohne Zahlungsart hält GitHub dann auch CI und Deploy an.
+
+name: Probe
+
+on:
+  schedule:
+    # UTC, im Sommer 7:17 bis 22:17 Wiener Zeit, im Winter eine Stunde früher.
+    # Minute 17 statt 0, weil GitHub Läufe zur vollen Stunde oft spät startet.
+    # Bei Änderung den Zeitplan der Prüfungen bei healthchecks.io mitziehen.
+    - cron: "17 5,8,11,14,17,20 * * *"
+  workflow_dispatch:
+    inputs:
+      strecken:
+        description: "Nur diese Strecken, mit Leerzeichen getrennt (leer = alle)"
+        required: false
+        default: ""
+      trocken:
+        description: "Nur bis vor das Absenden, schickt nichts ab"
+        type: boolean
+        default: false
+
+concurrency:
+  group: probe
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # Browser vorinstalliert, Version gleich @playwright/test in package.json.
+    container: mcr.microsoft.com/playwright:v1.64.0-noble
+    steps:
+      # Öffentliche Repos verlieren ihren Zeitplan nach 60 Tagen ohne Änderung.
+      # Jeder Lauf schaltet ihn deshalb ausdrücklich ein. Fällt er trotzdem
+      # aus, melden alle Prüfungen bei healthchecks.io.
+      - name: Zeitplan wach halten
+        continue-on-error: true
+        run: |
+          curl -fsS -X PUT -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/workflows/probe.yml/enable"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v4
+      - run: npm install --no-audit --no-fund
+      # Eingaben über env, nie direkt in die Befehlszeile (Einschleusen).
+      - run: node probe.mjs $TROCKEN $STRECKEN
+        env:
+          PROBE_TELEFON: ${{ secrets.PROBE_TELEFON }}
+          PRUEFUNGEN: ${{ secrets.PRUEFUNGEN }}
+          TROCKEN: ${{ inputs.trocken && '--trocken' || '' }}
+          STRECKEN: ${{ inputs.strecken }}
